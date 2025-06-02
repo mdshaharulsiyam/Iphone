@@ -23,7 +23,8 @@ const VideoCarousel = () => {
   useGSAP(() => {
     gsap.to("#slider", {
       transform: `translateX(${videoId * -100}%)`,
-      duration: 2
+      duration: 2,
+      ease: "power2.inOut"
     })
     gsap.to('#video', {
       scrollTrigger: {
@@ -37,14 +38,14 @@ const VideoCarousel = () => {
   }, [isEnd, videoId])
 
   useEffect(() => {
-    // if (loadedData.length > 3) {
+    // if (loadedData.length  3) {
     if (!isPlaying) {
       videoRef.current[videoId].pause()
     } else {
       startPlay && videoRef.current[videoId].play()
     }
     // }
-  }, [startPlay, videoId, isPlaying, loadedData])
+  }, [startPlay, videoId, isPlaying, loadedData, isLastVideo])
 
   useEffect(() => {
     let currentProgress = 0;
@@ -89,26 +90,29 @@ const VideoCarousel = () => {
   }, [videoId, startPlay])
 
   const handleProcess = useCallback((actions, i) => {
-    switch (actions) {
-      case "play": setVideo({ ...video, isPlaying: !video.isPlaying })
-        break;
-      // case "pause": setVideo({ ...video, isPlaying: true })
-      //   break;
-      case "last": setVideo({ ...video, isLastVideo: true })
-        break;
-      case "reset": setVideo({ ...video, isLastVideo: false, videoId: 0, })
-        break;
-      case "end": setVideo({ ...video, videoId: i + 1, isEnd: true })
-        break;
-      default:
-        return video
-    }
-  }, [])
+    setVideo((prevVideo) => {
+      switch (actions) {
+        case "play":
+          return { ...prevVideo, isPlaying: !prevVideo.isPlaying };
+        case "last":
+          return { ...prevVideo, isLastVideo: true, isPlaying: false };
+        case "reset":
+          return { ...prevVideo, isLastVideo: false, videoId: 0, isPlaying: false };
+        case "end":
+          if (i + 1 >= highlightsSlides.length) {
+            return { ...prevVideo, isLastVideo: true, isPlaying: false };
+          }
+          return { ...prevVideo, videoId: i + 1, isEnd: true };
+        default:
+          return prevVideo;
+      }
+    });
+  }, []);
+
 
   const handlerLoadedData = useCallback((i, e) => {
     setLoadedData([...loadedData, e])
   }, [loadedData])
-  console.log(video)
   return (
     <>
       <div className='flex items-center !mt-10'>
@@ -163,7 +167,7 @@ const VideoCarousel = () => {
         <button onClick={() =>
           isLastVideo ? handleProcess('reset') :
             !isPlaying ? handleProcess('play') :
-              handleProcess('pause')
+              handleProcess('play')
         }
           className='flex justify-center items-center !p-3 !ml-4 bg-gray-600 backdrop-blur rounded-full cursor-pointer'>
           <img src={isLastVideo ? replayImg : !isPlaying ? playImg : pauseImg} alt="" />
