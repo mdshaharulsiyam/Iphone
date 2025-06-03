@@ -112,7 +112,7 @@ const VideoCarousel = () => {
 
   const handlerLoadedData = useCallback((i, e) => {
     setLoadedData([...loadedData, e])
-  }, [loadedData])
+  }, [loadedData]);
   return (
     <>
       <div className='flex items-center !mt-10'>
