@@ -9,7 +9,7 @@ function ModelView({ index, groupRef, gsapType, controlRef, setRotationState, si
     <View
       index={index}
       id={gsapType}
-      className={` w-full h-full ${index === 2 ? "right-[-100%]" : ""}`}
+      className={` w-full h-full ${index === 2 ? "right-[-100%]" : ""} absolute`}
     >
       <ambientLight intensity={0.3} />
       <PerspectiveCamera makeDefault position={[0, 0, 4]} />
@@ -18,7 +18,7 @@ function ModelView({ index, groupRef, gsapType, controlRef, setRotationState, si
         ref={controlRef}
         enableZoom={false}
         enablePan={false}
-        // rotateSpeed={0.4}
+        rotateSpeed={0.4}
         target={new THREE.Vector3(0, 0, 0)}
         onEnd={() => setRotationState(controlRef.current.getAzimuthAngle())}
       />
@@ -26,7 +26,8 @@ function ModelView({ index, groupRef, gsapType, controlRef, setRotationState, si
         <Suspense fallback={null}>
           <Iphone
             scale={index === 1 ? [15, 15, 15] : [17, 17, 17]}
-
+            item={item}
+            size={size}
           />
         </Suspense>
       </group>
